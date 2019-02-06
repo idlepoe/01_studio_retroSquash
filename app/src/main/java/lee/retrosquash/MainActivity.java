@@ -2,6 +2,7 @@ package lee.retrosquash;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Canvas;
@@ -20,11 +21,20 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Random;
 
 public class MainActivity extends Activity {
+
+    SharedPreferences prefs;
+    SharedPreferences.Editor editor;
+    String dataName = "MyData";
+    String intName = "MyString";
+    int defaultInt =0;
+    int hiScore;
+
 
     Canvas canvas;
     SquashCourtView squashCourtView;
@@ -91,6 +101,9 @@ public class MainActivity extends Activity {
         newUiOptions ^= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
 
+        prefs = getSharedPreferences(dataName,MODE_PRIVATE);
+        editor = prefs.edit();
+        hiScore = prefs.getInt(intName,defaultInt);
 
         //Sound code
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
@@ -219,6 +232,12 @@ public class MainActivity extends Activity {
             if (ballPosition.y > screenHeight - ballWidth) {
                 lives = lives - 1;
                 if (lives == 0) {
+                    if(score > hiScore){
+                        hiScore = score;
+                        editor.putInt(intName,hiScore);
+                        editor.commit();
+                        // Toast.makeText(getApplicationContext(),"New Hi-score",Toast.LENGTH_LONG).show();
+                    }
                     lives = 3;
                     score = 0;
                     soundPool.play(sample4, 1, 1, 0, 0, 1);
@@ -306,9 +325,13 @@ public class MainActivity extends Activity {
                 canvas = ourHolder.lockCanvas();
                 //Paint paint = new Paint();
                 canvas.drawColor(Color.BLACK);//the background
+                paint.setColor(Color.GRAY);
+                canvas.drawText(hiScore+"", 240,400, paint);
                 paint.setColor(Color.argb(255, 255, 255, 255));
                 paint.setTextSize(45);
                 canvas.drawText("Score:" + score + " Lives:" + lives + " fps:" + fps, 20, 40, paint);
+
+
 
                 int racketLeft = racketPosition.x - (racketWidth / 2);
                 int racketTop = racketPosition.y - (racketHeight / 2);
