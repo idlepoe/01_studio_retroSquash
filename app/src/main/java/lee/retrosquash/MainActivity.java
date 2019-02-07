@@ -13,6 +13,7 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -322,14 +323,25 @@ public class MainActivity extends Activity {
         public void drawCourt() {
 
             if (ourHolder.getSurface().isValid()) {
+
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                WindowManager wm = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE); // the results will be higher than using the activity context object or the getWindowManager() shortcut
+                wm.getDefaultDisplay().getMetrics(displayMetrics);
+                int screenWidth = displayMetrics.widthPixels;
+                int screenHeight = displayMetrics.heightPixels;
+
+
+
                 canvas = ourHolder.lockCanvas();
                 //Paint paint = new Paint();
                 canvas.drawColor(Color.BLACK);//the background
                 paint.setColor(Color.GRAY);
-                canvas.drawText(hiScore+"", 240,400, paint);
+                paint.setTextSize(200);
+                canvas.drawText(hiScore+"", screenWidth/2,screenHeight/2, paint);
                 paint.setColor(Color.argb(255, 255, 255, 255));
                 paint.setTextSize(45);
                 canvas.drawText("Score:" + score + " Lives:" + lives + " fps:" + fps, 20, 40, paint);
+
 
 
 
@@ -338,8 +350,8 @@ public class MainActivity extends Activity {
                 int racketRight = racketPosition.x + (racketWidth / 2);
                 int racketBottom = racketPosition.y + racketHeight;
 
-                if(racketPosition.x >420){
-                    racketPosition.x = 420;
+                if(racketPosition.x >screenWidth-60){
+                    racketPosition.x = screenWidth-60;
                 }
                 if(racketPosition.x <60){
                     racketPosition.x = 60;
